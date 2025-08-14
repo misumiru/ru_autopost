@@ -2,26 +2,26 @@ name: Post to X at 08:00/19:00 JST
 
 on:
   schedule:
-    - cron: '0 23 * * *'   # 08:00 JST（= 前日の23:00 UTC）
-    - cron: '0 10 * * *'   # 19:00 JST（= 10:00 UTC）
-  workflow_dispatch: {}     # 手動実行ボタン
+    - cron: '0 23 * * *'   # 08:00 JST
+    - cron: '0 10 * * *'   # 19:00 JST
+  workflow_dispatch: {}
 
 permissions:
-  contents: write           # 履歴をコミットするため
+  contents: write
 
 jobs:
   post:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
       - name: Install deps
         run: |
-          python -m pip install --upgrade pip tweepy
+          python -m pip install --upgrade pip
+          python -m pip install tweepy jpholiday
 
       - name: Post once (JST)
         env:
@@ -29,7 +29,7 @@ jobs:
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-          # X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}   # 任意
+          # X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
           python post_jst.py
 
@@ -42,3 +42,4 @@ jobs:
             git commit -m "chore: log post $(date -u +'%Y-%m-%dT%H:%M:%SZ')" || echo "no changes"
             git push
           fi
+
